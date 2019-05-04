@@ -1,38 +1,32 @@
-var friends = require("../data/friends");
-var path = require("path");
+const friends = require('../data/friends')
 
-module.exports = function(app, path) {
-    app.get("/api/friends", function(req, res) {
-        res.json(friends);
-    });
+const express = require('express')
+const router = express.Router()
 
-    app.post("/api/friends", function(req, res) {
-        var bestMatch = {
-            name: "",
-            photo: "",
-            scoreDifference: 40    
-        };
-        var userData = req.body;
-        var userScores = userData.scores;
-        var userName = userData.name;
-        var userPhoto = userData.photo;
-        var totalDifference = 0;
-        
-        for (var i = 0; i < friends.length - 1; i++) {
-            totalDifference = 0;
+router.get('/api/friends', (req, res) => {
+    res.json(friends)
+})
 
-            for (var k = 0; k < 10; k++) {
-                totalDifference += Math.abs(parseInt(userScores[k]) - parseInt(friends[i].scores[k]));
-
-                if (totalDifference <= bestMatch.scoreDifference) {
-                    bestMatch.name = friends[i].name;
-                    bestMatch.photo = friends[i].photo;
-                    bestMatch.scoreDifference = totalDifference;
-                }
-            }
+router.post('/api/friends', (req, res) => {
+    const userInput = req.body
+    const userScores = userInput.surveyAnswers.map(x => parseInt(x))
+    let bestScore = 40
+    let newFriend
+    
+    for (let i = 0; i < friends.length; i++) {
+        const currentScore = totalDifference(friends[i].scores, userScores)
+        if (currentScore <= bestScore) {
+            bestScore = currentScore
+            newFriend = friends[i]
         }
+    }
+    res.send(newFriend)
+})
 
-        friends.push(userData);
-        res.json(bestMatch);
-    });
-};
+function totalDifference(arr1, arr2) {
+    arr1Sum = arr1.reduce((acc, cur) => acc + cur)
+    arr2Sum = arr2.reduce((acc, cur) => acc + cur)
+    return Math.abs(arr1Sum - arr2Sum)
+}
+
+module.exports = router

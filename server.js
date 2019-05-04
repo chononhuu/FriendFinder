@@ -1,15 +1,20 @@
-var express = require("express");
+const apiRoutes = require('./app/routing/apiRoutes')
+const htmlRoutes = require('./app/routing/htmlRoutes')
 
-var app = express();
+const bodyParser = require('body-parser')
+const path = require('path')
+const express = require('express')
+const app = express()
 
-var PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
-require("./app/routing/apiRoutes")(app);
-require("./app/routing/htmlRoutes")(app);
+app.use(express.static(path.join(__dirname, '/app/public')))
+app.use(express.static(path.join(__dirname, '/public')))
 
-app.listen(PORT, function() {
-    console.log("App listening on PORT: " + PORT);
-});
+app.use(apiRoutes)
+app.use(htmlRoutes)
+
+app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`))
