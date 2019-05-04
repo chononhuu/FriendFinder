@@ -1,6 +1,7 @@
 var friends = require("../data/friends");
+var path = require("path");
 
-module.exports = function(app) {
+module.exports = function(app, path) {
     app.get("/api/friends", function(req, res) {
         res.json(friends);
     });
